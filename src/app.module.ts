@@ -6,9 +6,19 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { NewsletterModule } from './modules/newsletter/newsletter.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ProductsModule, CategoriesModule, OrdersModule, PaymentsModule, NewsletterModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ProductsModule,
+    CategoriesModule,
+    OrdersModule,
+    PaymentsModule,
+    NewsletterModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
