@@ -5,15 +5,11 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
   @Get()
-  findAll() {
-    return this.productsService.findAll();
-  }
-  @Get('paginate')
-  paginate(
-    @Query('page', ParseIntPipe) page: number,
-    @Query('pageSize', ParseIntPipe) pageSize: number,
-  ) {
-    return this.productsService.paginate(page, pageSize);
+  findAll(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
+    return this.productsService.findAll({
+      page: page ? parseInt(page, 10) : undefined,
+      pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+    });
   }
   @Get('category/:categoryId')
   findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
