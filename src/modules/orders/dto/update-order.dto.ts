@@ -4,5 +4,5 @@ import { OrderStatus } from '@prisma/client';
 export class UpdateOrderStatusDto {
   @IsEnum(OrderStatus)
   @IsNotEmpty()
-  status: OrderStatus;
+  status!: OrderStatus;
 }

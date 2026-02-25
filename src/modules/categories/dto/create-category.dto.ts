@@ -12,7 +12,7 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(50)
-  name: string;
+  name!: string;
 
   @IsBoolean()
   @IsOptional()
