@@ -46,6 +46,17 @@ model Order {
   status        OrderStatus @default(PENDING)
   createdAt     DateTime    @default(now())
   items         OrderItem[]
+  payments Payment?
+}
+
+model Payment {
+  id        Int           @id @default(autoincrement())
+  amount    Decimal       @db.Decimal(10, 2)
+  status    PaymentStatus
+  createdAt DateTime      @default(now())
+
+  orderId   Int           @unique
+  order     Order         @relation(fields: [orderId], references: [id])
 }
 
 model OrderItem {
@@ -60,6 +71,8 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
 }
 
+
+
 model NewsletterSubscriber {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -71,4 +84,9 @@ enum OrderStatus {
   PENDING
   PAID
   CANCELLED
+}
+
+enum PaymentStatus {
+  SUCCESS
+  FAILED
 }
