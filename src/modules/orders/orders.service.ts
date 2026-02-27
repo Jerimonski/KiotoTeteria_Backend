@@ -19,24 +19,58 @@ interface FindAllParams {
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    try {
-      return await this.prisma.order.create({
+    const { customerEmail, items } = createOrderDto;
+
+    if (!items || items.length === 0) {
+      throw new BadRequestException('Order must contain at least one item');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const productIds = items.map((i) => i.productId);
+
+      const products = await tx.product.findMany({
+        where: { id: { in: productIds }, isActive: true },
+      });
+
+      if (products.length !== productIds.length) {
+        throw new BadRequestException('One or more products are invalid');
+      }
+
+      let total = new Prisma.Decimal(0);
+
+      const orderItemsData = items.map((item) => {
+        const product = products.find((p) => p.id === item.productId);
+
+        if (!product) {
+          throw new BadRequestException(`Product ${item.productId} not found`);
+        }
+
+        const lineTotal = product.price.mul(item.quantity);
+        total = total.add(lineTotal);
+
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: product.price,
+        };
+      });
+
+      const order = await tx.order.create({
         data: {
-          customerEmail: createOrderDto.customerEmail,
+          customerEmail,
           status: OrderStatus.PENDING,
-          totalAmount: createOrderDto.totalAmount,
+          totalAmount: total,
+          items: {
+            create: orderItemsData,
+          },
+        },
+        include: {
+          items: true,
         },
       });
-    } catch (error) {
-      console.log(error);
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new BadRequestException('Category name or slug already exists');
-      }
-      throw error;
-    }
+
+      return order;
+    });
   }
   async updateStatus(id: number, status: OrderStatus) {
     const order = await this.prisma.order.findUnique({
