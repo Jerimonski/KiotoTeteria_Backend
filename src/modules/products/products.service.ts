@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { PaginationOptions } from 'src/common/pagination/pagination-options';
+import { CreateProductDto } from './dto/create-product.dto';
+import { Product, Prisma } from '@prisma/client';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 interface FindAllParams {
   page?: number;
   pageSize?: number;
@@ -48,6 +51,54 @@ export class ProductsService {
       orderBy: {
         createdAt: 'desc',
       },
+    });
+  }
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    try {
+      return await this.prisma.product.create({
+        data: {
+          name: createProductDto.name,
+          slug: createProductDto.slug,
+          description: createProductDto.description,
+          price: createProductDto.price,
+          categoryId: createProductDto.categoryId,
+          isActive: false,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException('Slug already exists');
+      }
+      throw error;
+    }
+  }
+
+  async updateStatus(id: number, isActive: boolean): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return this.prisma.product.update({
+      where: { id },
+      data: { isActive },
+    });
+  }
+  async remove(id: number): Promise<Product> {
+    const product = this.prisma.product.delete({
+      where: { id },
+    });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return await this.prisma.product.delete({
+      where: { id },
     });
   }
 }
