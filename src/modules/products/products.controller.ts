@@ -1,9 +1,19 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  Body,
+  Delete,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { JwtAuthGuard } from './../../guards/jwt-auth.guard';
 import { RolesGuard } from './../../guards/roles.guard';
 import { Roles } from './../auth/decorators/roles.decorator';
-import { Body, Delete, Patch, Post, UseGuards } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductStatusDto } from './dto/update-product.dto';
 
@@ -13,8 +23,8 @@ export class ProductsController {
   @Get()
   findAll(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
     return this.productsService.findAll({
-      page: page ? parseInt(page, 10) : undefined,
-      pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+      page: page ? Number.parseInt(page, 10) : undefined,
+      pageSize: pageSize ? Number.parseInt(pageSize, 10) : undefined,
     });
   }
   @Get('category/:categoryId')

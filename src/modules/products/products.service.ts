@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { PaginationOptions } from 'src/common/pagination/pagination-options';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product, Prisma } from '@prisma/client';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 interface FindAllParams {
   page?: number;
   pageSize?: number;
@@ -94,7 +97,7 @@ export class ProductsService {
     const product = this.prisma.product.delete({
       where: { id },
     });
-    if (!product) {
+    if (await product) {
       throw new NotFoundException('Product not found');
     }
     return await this.prisma.product.delete({
