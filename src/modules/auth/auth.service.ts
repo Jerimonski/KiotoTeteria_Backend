@@ -14,7 +14,7 @@ export class AuthService {
       where: { email },
     });
 
-    if (!admin || !admin.isActive) {
+    if (!admin?.isActive) {
       throw new BadRequestException('Invalid credentials');
     }
 

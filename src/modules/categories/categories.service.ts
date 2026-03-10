@@ -49,7 +49,7 @@ export class CategoriesService {
   }
 
   async findOne(identifier: string) {
-    const isNumeric = !isNaN(Number(identifier));
+    const isNumeric = !Number.isNaN(Number(identifier));
 
     if (isNumeric) {
       return this.prisma.category.findUnique({
@@ -107,7 +107,7 @@ export class CategoriesService {
     const product = this.prisma.category.delete({
       where: { id },
     });
-    if (!product) {
+    if (await product) {
       throw new NotFoundException('Category not found');
     }
     return await this.prisma.category.delete({
