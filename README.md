@@ -1,98 +1,243 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🍵 Kioto Tetería Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 📌 Descripción General
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Backend desarrollado con **NestJS** para la gestión integral de una tetería. Provee una API robusta y escalable para el manejo de catálogo, ventas y administración.
 
-## Description
+- **Catálogo de productos:** Gestión de stock, precios y visibilidad.
+- **Gestión de categorías:** Organización lógica de los tipos de té.
+- **Procesamiento de pedidos:** Registro de compras y flujo de estados.
+- **Suscripciones a newsletter:** Captación de correos para marketing.
+- **Panel administrativo:** Acceso protegido mediante autenticación basada en **JWT** y roles.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 📊 Modelo de Base de Datos
 
-```bash
-$ pnpm install
+Estructura relacional diseñada en **PostgreSQL** y gestionada con **Prisma ORM**.
+
+
+
+<img width="1261" height="585" alt="image" src="https://github.com/user-attachments/assets/0f389384-3823-499d-9428-7bccf5647748" />
+
+
+---
+
+## 🔍 Calidad de Código (SonarQube)
+
+Para garantizar un código limpio, mantenible y libre de vulnerabilidades, el proyecto integra **SonarQube**. Se realizan análisis estáticos constantes para evaluar:
+- **Bugs y Vulnerabilidades:** Identificación de posibles fallos de seguridad o lógica.
+- **Code Smells:** Detección de código confuso o difícil de mantener.
+- **Coverage:** Medición de la cobertura de pruebas unitarias.
+- **Duplicaciones:** Control de código redundante.
+
+<img width="1037" height="593" alt="image" src="https://github.com/user-attachments/assets/99b00902-6fd2-40a1-af65-c812b98fba77" />
+
+
+---
+
+## 🏗 Arquitectura Modular
+
+El proyecto sigue una arquitectura modular basada en dominios para asegurar un código limpio y fácil de mantener.
+
+- **Modules:** Organización por dominio (Auth, Products, Categories, Orders, Newsletter).
+- **Controllers:** Capa de entrada que maneja las peticiones HTTP y define los endpoints.
+- **Services:** Contienen la lógica de negocio y el procesamiento de los datos.
+- **Prisma (Models):** Esquema relacional y acceso a base de datos PostgreSQL.
+- **Guards:** Control de acceso y protección de rutas mediante roles y JWT.
+
+---
+
+## 🧠 Stack Tecnológico
+
+- Node.js & NestJS 11
+- TypeScript
+- PostgreSQL & Prisma ORM
+- JWT (Passport.js) & bcrypt
+- class-validator & class-transformer
+- SonarQube (Análisis de calidad de código)
+
+---
+
+## 🔐 Autenticación (Auth)
+
+### POST /auth/login
+Valida las credenciales del administrador y genera un token de acceso.
+
+**Body:**
+```
+{
+  "email": "admin@kiototeteria.cl",
+  "password": "password123"
+}
+```
+---
+
+## 📂 Categorías (Categories)
+
+### GET /categories
+Obtiene todas las categorías disponibles.
+**Ejemplo:** `GET http://localhost:3000/categories`
+
+### GET /categories/:identifier
+Busca por ID o Slug.
+**Ejemplo:** `GET http://localhost:3000/categories/te-verde` o `GET http://localhost:3000/categories/1`
+
+### POST /categories (Protegido - ADMIN)
+Crea una nueva categoría.
+
+**Body:** 
+```
+{
+"name": "Té Blanco"
+}
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+### PATCH /categories/:id (Protegido - ADMIN)
+Actualiza el nombre de una categoría.
+**Ejemplo:** `PATCH http://localhost:3000/categories/1`
+<br>
+**Body:** 
+```
+{
+  "name": "Té Blanco Premium"
+}
 ```
 
-## Run tests
+### DELETE /categories/:id (Protegido - ADMIN)
+Elimina una categoría del sistema.
+**Ejemplo:** `DELETE http://localhost:3000/categories/1`
 
-```bash
-# unit tests
-$ pnpm run test
+---
 
-# e2e tests
-$ pnpm run test:e2e
+## 📦 Productos (Products)
 
-# test coverage
-$ pnpm run test:cov
+### GET /products
+Lista productos con paginación.
+**Ejemplo:** `GET http://localhost:3000/products?page=1&pageSize=5`
+
+### GET /products/:id
+Detalle de un producto por ID.
+**Ejemplo:** `GET http://localhost:3000/products/12`
+
+### GET /products/category/:categoryId
+Productos de una categoría específica.
+**Ejemplo:** `GET http://localhost:3000/products/category/2`
+
+### POST /products (Protegido - ADMIN)
+Crea un nuevo producto.
+
+**Body:**
+```
+{ 
+  "name": "Té Oolong", 
+  "description": "Té semi-oxidado", 
+  "price": 18.50, 
+  "categoryId": 1 
+}
 ```
 
-## Deployment
+### PATCH /products/:id/status (Protegido - ADMIN)
+Cambia la visibilidad del producto (isActive).
+**Ejemplo:** `PATCH http://localhost:3000/products/5/status`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+**Body:** 
+```
+{
+  "isActive": true
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### DELETE /products/:id (Protegido - ADMIN)
+Elimina un producto del catálogo.
+**Ejemplo:** `DELETE http://localhost:3000/products/5`
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🛒 Pedidos (Orders)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### GET /orders (Protegido - ADMIN)
+Lista de pedidos con filtros opcionales.
+**Ejemplo:** `GET http://localhost:3000/orders?status=PAID&customerEmail=user@mail.com`
 
-## Support
+### GET /orders/:id
+Busca una orden específica.
+**Ejemplo:** `GET http://localhost:3000/orders/101`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### POST /orders
+Registra una nueva compra (Checkout).
 
-## Stay in touch
+**Body:**
+```
+{
+  "customerEmail": "cliente@mail.com",
+  "items": [ { "productId": 1, "quantity": 3 } ]
+}
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### PATCH /orders/:id/status (Protegido - ADMIN)
+Cambia el estado de la orden (PENDING, PAID, CANCELLED).
+**Ejemplo:** `PATCH http://localhost:3000/orders/101/status`
 
-## License
+**Body:** 
+```
+{
+  "status": "PAID"
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## 📧 Newsletter
+
+### POST /newsletter/subscribe
+Suscribe un correo a la lista.
+
+**Body:** 
+```
+{
+"email": "interesado@mail.com"
+}
+```
+---
+
+## 🗂 Estructura del Proyecto
+```
+src/
+├── main.ts                 # Punto de entrada
+├── app.module.ts           # Módulo raíz
+├── common/                 # DTOs y paginación
+├── guards/                 # Seguridad (JWT/Roles)
+├── modules/
+│   ├── auth/               # Seguridad y JWT
+│   ├── categories/         # CRUD de categorías
+│   ├── newsletter/         # Suscriptores
+│   ├── orders/             # Transacciones y pedidos
+│   └── products/           # Catálogo de productos
+└── prisma/                 # Schema y cliente Prisma
+```
+---
+
+## 🚀 Scripts
+
+Instalación:
+```
+pnpm install
+```
+
+Base de datos:
+```
+pnpm run prisma:generate
+pnpm run prisma:migrate
+```
+
+Desarrollo:
+```
+pnpm run start:dev
+```
+
+Producción:
+```
+npm run build
+npm run start:prod
+```
