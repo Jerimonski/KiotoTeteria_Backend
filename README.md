@@ -8,6 +8,7 @@ Backend desarrollado con **NestJS** para la gestión integral de una tetería. P
 - **Suscripciones a newsletter:** Captación de correos para marketing.
 - **Panel administrativo:** Acceso protegido mediante autenticación basada en **JWT** y roles.
 
+** documentacion: https://jerimonski-kiototeteria_backend.mintlify.app/introduction
 ---
 
 ## 📊 Modelo de Base de Datos
