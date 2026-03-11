@@ -1,6 +1,4 @@
-# 🍵 Kioto Tetería Backend
-
-## 📌 Descripción General
+# 📌 Descripción General
 
 Backend desarrollado con **NestJS** para la gestión integral de una tetería. Provee una API robusta y escalable para el manejo de catálogo, ventas y administración.
 
