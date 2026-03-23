@@ -237,6 +237,6 @@ pnpm run start:dev
 
 Producción:
 ```
-npm run build
-npm run start:prod
+pnpm run build
+pnpm run start:prod
 ```
