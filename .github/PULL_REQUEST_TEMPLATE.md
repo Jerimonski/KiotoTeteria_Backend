@@ -1,8 +1,7 @@
 # Descripción
 
 > Explica de forma breve para qué es esta PR. Añade issues relacionados abajo.
-
----
+> (Recuerda quitar estos comentarios antes de subir la pull request)
 
 ## Tipo de Cambio:
 
@@ -14,13 +13,9 @@
 - [ ] Actualización a la documentación
 - [ ] Cambio en Config / DevOps
 
----
-
 ## Qué cambió y por qué:
 
 > Describe específicamente los cambios y las razones detrás de cada decisión.
-
----
 
 ## Pasos para reproducir / test:
 
@@ -36,8 +31,6 @@ curl -X [METHOD] http://localhost:3000/[route] \
 ```
 4. Resultado esperado.
 
----
-
 ## Endpoints Afectados:
 
 > Menciona cualquer endpoint nuevo, modificado o eliminado:
@@ -45,8 +38,6 @@ curl -X [METHOD] http://localhost:3000/[route] \
 | Método | Ruta | Cambio |
 |--------|-------|--------|
 | `GET`  | `/example` | Añadido |
-
----
 
 ## Screenshots / Logs _(opcional)_
 
