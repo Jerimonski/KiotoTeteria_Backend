@@ -16,21 +16,16 @@ import { RolesGuard } from './../../guards/roles.guard';
 import { Roles } from './../auth/decorators/roles.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductStatusDto } from './dto/update-product.dto';
+import { GetProductsDto } from './dto/get-products.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
   @Get()
-  findAll(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
-    return this.productsService.findAll({
-      page: page ? Number.parseInt(page, 10) : undefined,
-      pageSize: pageSize ? Number.parseInt(pageSize, 10) : undefined,
-    });
+  findAll(@Query() query: GetProductsDto) {
+    return this.productsService.findAll(query);
   }
-  @Get('category/:categoryId')
-  findByCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.productsService.findByCategory(categoryId);
-  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.findOne(id);

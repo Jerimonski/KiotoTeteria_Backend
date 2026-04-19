@@ -11,6 +11,11 @@ interface FindAllParams {
   page?: number;
   pageSize?: number;
   categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  sort?: 'price' | 'name';
+  order?: 'asc' | 'desc';
 }
 @Injectable()
 export class ProductsService {
@@ -18,10 +23,31 @@ export class ProductsService {
 
   async findAll(params: FindAllParams) {
     const { page, pageSize, skip, take } = PaginationOptions.resolve(params);
-    const { categoryId } = params;
+    const { categoryId, minPrice, maxPrice, search, sort, order } = params;
+    const cleanSearch = search?.trim();
+    const allowedSorts = ['price', 'name'];
+    const sortOrder: Prisma.SortOrder = order === 'desc' ? 'desc' : 'asc';
 
-    const where = {
-      ...(categoryId && { categoryId }),
+    const where: Prisma.ProductWhereInput = {
+      isActive: true,
+
+      ...(categoryId !== undefined && { categoryId }),
+
+      ...(minPrice !== undefined || maxPrice !== undefined
+        ? {
+            price: {
+              ...(minPrice !== undefined && { gte: minPrice }),
+              ...(maxPrice !== undefined && { lte: maxPrice }),
+            },
+          }
+        : {}),
+
+      ...(cleanSearch && {
+        OR: [
+          { name: { contains: cleanSearch, mode: 'insensitive' } },
+          { description: { contains: cleanSearch, mode: 'insensitive' } },
+        ],
+      }),
     };
 
     const [products, total] = await this.prisma.$transaction([
@@ -29,8 +55,11 @@ export class ProductsService {
         where,
         skip,
         take,
-        orderBy: {
-          createdAt: 'desc',
+        orderBy: allowedSorts.includes(sort || '')
+          ? [{ [sort!]: sortOrder }, { createdAt: 'desc' }]
+          : { createdAt: 'desc' },
+        include: {
+          category: true,
         },
       }),
       this.prisma.product.count({ where }),
@@ -43,20 +72,32 @@ export class ProductsService {
   }
 
   async findOne(id: number) {
-    return this.prisma.product.findUnique({
-      where: { id },
-    });
-  }
-
-  async findByCategory(categoryId: number) {
-    return this.prisma.product.findMany({
-      where: { categoryId },
-      orderBy: {
-        createdAt: 'desc',
+    const product = await this.prisma.product.findFirst({
+      where: {
+        id,
+        isActive: true,
+      },
+      include: {
+        category: true,
       },
     });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
   }
+
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    const category = await this.prisma.category.findUnique({
+      where: { id: createProductDto.categoryId },
+    });
+
+    if (!category) {
+      throw new BadRequestException('Category does not exist');
+    }
+
     try {
       return await this.prisma.product.create({
         data: {
@@ -69,11 +110,14 @@ export class ProductsService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new BadRequestException('Slug already exists');
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new BadRequestException('Slug already exists');
+        }
+
+        if (error.code === 'P2003') {
+          throw new BadRequestException('Category does not exist');
+        }
       }
       throw error;
     }
@@ -94,13 +138,15 @@ export class ProductsService {
     });
   }
   async remove(id: number): Promise<Product> {
-    const product = this.prisma.product.delete({
+    const product = await this.prisma.product.findUnique({
       where: { id },
     });
-    if (await product) {
+
+    if (!product) {
       throw new NotFoundException('Product not found');
     }
-    return await this.prisma.product.delete({
+
+    return this.prisma.product.delete({
       where: { id },
     });
   }
