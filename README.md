@@ -240,3 +240,39 @@ Producción:
 pnpm run build
 pnpm run start:prod
 ```
+
+## Docker
+
+Si no quieres optar por descargar y configurar postgresql en tu máquina, puedes optar por [Docker](https://www.docker.com/) y levantar un contenedor con la base de datos. ¡Es (relativamente) simple!
+
+El archivo `docker-compose.yml` utiliza docker para levantar un contenedor específico para postgresql, utilizando datos del `.env`. A continuación, se dejan los campos necesarios:
+
+
+### POSTGRESQL:
+
+```
+POSTGRES_USER=TU_USER
+POSTGRES_PASSWORD=TU_PASSWORD
+POSTGRES_DB=TU_DB
+POSTGRES_PORT=TU_PUERTO (por lo general se usa 5432)
+```
+
+### PRISMA:
+
+```
+DATABASE_URL="TU_USER://user:TU_PASSWORD@localhost:TU_PUERTO/TU_DB"
+```
+
+IMPORTANTE: Asegúrate de estar en el directorio del proyecto antes de ejecutar los siguientes comandos:
+
+Ahora, levanta docker compose (`-d` es para el detached mode):
+
+`docker compose up -d`
+
+Luego, ejecuta las migraciones de prisma para crear las tablas y campos necesarios:
+
+`pnpm prisma migrate dev --name init`
+
+Finalmente, ya puedes iniciar el proyecto usando la base de datos del contenedor:
+
+`pnpm run start:dev`.
